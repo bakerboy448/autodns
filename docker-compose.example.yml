@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  cf-dns-updater:
+    build: .
+    ports:
+      - "4295:4295"
+    volumes:
+      - /your/path/to/config:/config
+    environment:
+      CF_ZONE_ID: "your-zone-id"
+      CF_API_TOKEN: "your-api-token"
+      APPRISE_URLS: "your-apprise-urls-separated-by-commas"
