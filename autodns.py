@@ -1,39 +1,26 @@
 """
-The `autodns.py` module automates DNS record management for Cloudflare-hosted domains directly from the command line or through a Flask-based web interface. Utilizing environment variables for configuration, it supports creating, updating, and deleting DNS A records based on GUID mappings, with automatic IP detection for incoming web requests. Notifications on operation outcomes are dispatched using the Apprise library.
+DNS Management Tool for Cloudflare
 
-Features include:
-- Command Line Interface (CLI) for direct script interactions to manage DNS records.
-- Flask web server integration for handling DNS updates via web requests.
-- GUID to DNS A record mapping, facilitating secure and identifiable record management.
-- Automatic IP detection from incoming web requests, supporting both direct and proxied connections.
-- Notification system powered by Apprise, supporting a broad array of services for real-time operation alerts.
+This script automates the management of DNS records for domains hosted on Cloudflare, enabling direct interactions from the command line or through a Flask-based web interface. It uses environment variables for configuration, supports operations such as creating, updating, and deleting DNS A records based on GUID mappings, and features automatic IP detection for incoming web requests. The tool also includes a configurable notification system for operation alerts.
 
-Modules Used:
-- `json`: For loading and handling the GUID to A record mappings from a JSON file.
-- `os`: To access environment variables for Cloudflare API credentials and Apprise configuration.
-- `apprise`: Utilized for sending operation outcome notifications across various platforms.
-- `requests`: Employed to interact with the Cloudflare API for DNS record management.
-- `flask`: Facilitates the creation of the web interface, enabling DNS updates through HTTP requests.
-
-Environment Variables:
-- `CF_ZONE_ID`: Specifies the Cloudflare zone ID where DNS records will be managed.
-- `CF_API_TOKEN`: The API token used for authentication with the Cloudflare API.
-- `APPRISE_URLS`: Defines a comma-separated list of URLs for Apprise notification services.
-
-Available Commands:
-- `generate <subdomain>`: Creates a new GUID record for the specified subdomain.
-- `create <subdomain>`: Creates a new DNS A record for the specified subdomain.
-- `delete <subdomain>`: Removes an existing DNS A record matching the specified subdomain.
-- `update <subdomain> <ip_address>`: Updates the IP address of the specified subdomain's DNS A record.
-- `status`: Retrieves the current status of all managed DNS records and operation logs.
-- `server`: Run the flask server and listen to incoming requests with the specified guid to update a subdomain's A record 
+Features:
+- CLI for DNS record management.
+- Flask web server for DNS updates via web requests.
+- GUID to DNS A record mapping for secure record management.
+- Automatic IP detection from web requests, supporting both direct and proxied connections.
+- Configurable notification system using Apprise.
 
 Usage:
-- To execute a CLI command: `python autodns.py <command> [arguments]`
-- To run the Flask web server: Simply execute `python autodns.py` without any commands.
+- For CLI operations: `python autodns.py generate <subdomain>`
+- To run the Flask server: `python autodns.py`, then access `http://localhost:<port>/update-dns?guid=<GUID>`
 
-Note: This module assumes a pre-existing Flask environment and requires prior configuration of Cloudflare API credentials and Apprise notification URLs through environment variables.
+Configuration:
+- Set Cloudflare API credentials (`CF_ZONE_ID`, `CF_API_TOKEN`), notification service URLs (`APPRISE_URLS`), enable notifications (`ENABLE_NOTIFICATIONS`), and optionally the Flask server port (`FLASK_RUN_PORT`) via environment variables.
+
+Dependencies:
+- Flask, Apprise, requests, hashlib, datetime, and standard Python libraries.
 """
+
 import argparse
 import hashlib
 import json
@@ -45,6 +32,9 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 import apprise
 
+# Constants
+RATE_LIMIT_MINUTES = 10  # Time between updates in minutes
+
 app = Flask(__name__)
 
 # Environment Variables
@@ -53,10 +43,10 @@ CF_API_TOKEN = os.getenv("CF_API_TOKEN")
 CF_API_URL_BASE = f"https://api.cloudflare.com/client/v4/zones/{CF_ZONE_ID}/dns_records"
 ENABLE_NOTIFICATIONS = os.getenv("ENABLE_NOTIFICATIONS", "false").lower() in ["true", "1", "t"]
 APPRISE_URLS = os.getenv("APPRISE_URLS", "").split(",")
-
 MAPPING_FILE = 'guid_mapping.json'
 
 def load_guid_mapping():
+    """Load GUID to A record mapping and last update timestamps from a JSON file."""
     try:
         with open(MAPPING_FILE, 'r') as file:
             return json.load(file)
@@ -68,6 +58,7 @@ def load_guid_mapping():
         sys.exit(f"Error loading GUID mapping: {e}")
 
 def save_guid_mapping(mapping):
+    """Save the updated GUID mapping and timestamps back to the JSON file."""
     try:
         with open(MAPPING_FILE, 'w') as file:
             json.dump(mapping, file, indent=4)
@@ -75,17 +66,20 @@ def save_guid_mapping(mapping):
         sys.exit(f"Error saving GUID mapping: {e}")
 
 def generate_guid(subdomain):
+    """Generate a 64-character SHA-256 hash GUID based on subdomain and current time."""
     unique_string = f"{subdomain}{time.time()}"
     return hashlib.sha256(unique_string.encode()).hexdigest()
 
 def is_update_allowed(guid):
+    """Check if the update is allowed based on the last updated timestamp."""
     mapping = load_guid_mapping()
     if guid not in mapping:
         return True
     last_update = datetime.fromisoformat(mapping[guid]["lastUpdated"])
-    return datetime.now() - last_update > timedelta(minutes=10)
+    return datetime.now() - last_update > timedelta(minutes=RATE_LIMIT_MINUTES)
 
 def send_notification(message):
+    """Send notification using Apprise if notifications are enabled and configured."""
     if not ENABLE_NOTIFICATIONS or not APPRISE_URLS:
         print("Notifications are disabled or not configured.")
         return
@@ -101,6 +95,7 @@ def send_notification(message):
 
 @app.route("/update-dns", methods=["GET"])
 def update_dns_web():
+    """Web endpoint to update DNS record based on GUID and detected IP."""
     guid = request.args.get("guid")
     if not guid:
         return jsonify({"error": "GUID parameter is missing"}), 400
@@ -127,7 +122,20 @@ def update_dns_web():
     else:
         return jsonify({"error": "DNS record does not exist or Cloudflare API error."}), 404
 
-def handle_generate_command(subdomain):
+def parse_arguments():
+    """Parse command line arguments for the DNS management script."""
+    parser = argparse.ArgumentParser(description="Manage DNS records via Cloudflare API.")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    generate_parser = subparsers.add_parser("generate", help="Generate a new GUID for a subdomain")
+    generate_parser.add_argument("subdomain", type=str, help="Subdomain for which to generate a GUID")
+    generate_parser.set_defaults(func=handle_generate_command)
+
+    return parser.parse_args()
+
+def handle_generate_command(args):
+    """Handle the 'generate' command to create a new GUID for a subdomain."""
+    subdomain = args.subdomain
     guid = generate_guid(subdomain)
     mapping = load_guid_mapping()
     if subdomain in [m["subdomain"] for m in mapping.values()]:
@@ -138,22 +146,12 @@ def handle_generate_command(subdomain):
     print(f"Generated GUID for {subdomain}: {guid}")
     send_notification(f"Generated new GUID for {subdomain}.")
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(description="Manage DNS records via Cloudflare API.")
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-    
-    generate_parser = subparsers.add_parser("generate", help="Generate a new GUID for a subdomain")
-    generate_parser.add_argument("subdomain", type=str, help="Subdomain for which to generate a GUID")
-    generate_parser.set_defaults(func=handle_generate_command)
-
-    return parser.parse_args()
-
 def main():
+    """Main function to run the Flask app or handle CLI commands."""
     args = parse_arguments()
     if hasattr(args, 'func'):
-        args.func(args.subdomain)
-    else:
-        app.run(host="0.0.0.0", port=5000)
-
-if __name__ == "__main__":
-    main()
+        args.func(args) else: # If no CLI command is provided, run the Flask app # Use the FLASK_RUN_PORT environment variable or default to port 5000
+        port = int(os.getenv("FLASK_RUN_PORT", "5000"))
+        app.run(host="0.0.0.0", port=port)
+        if name == "main":
+            main()
