@@ -1,40 +1,17 @@
-"""
-autodns.py
-
-This module contains the implementation of a Flask application that interacts with the Cloudflare API.
-It uses environment variables to configure the Cloudflare zone and API token, and provides a route to update DNS records.
-The module also uses the Apprise library to send notifications, and loads a GUID to A record mapping from a file.
-
-Modules:
-    - json: Used to load the GUID to A record mapping from a JSON file.
-    - os: Used to get environment variables.
-    - apprise: Used to send notifications.
-    - requests: Used to make requests to the Cloudflare API.
-    - flask: Used to create the Flask application and handle requests.
-
-Environment Variables:
-    - CF_ZONE_ID: The ID of the Cloudflare zone to update.
-    - CF_API_TOKEN: The API token to use when making requests to the Cloudflare API.
-    - APPRISE_URLS: A comma-separated list of Apprise URLs to send notifications to.
-
-Functions:
-    - load_guid_mapping: Loads the GUID to A record mapping from a file.
-"""
+import argparse
 import json
 import os
+import uuid
+from flask import Flask, request, jsonify
 import apprise
 import requests
-from flask import Flask, request
-
 
 app = Flask(__name__)
 
+# Configuration and Global Variables
 CF_ZONE_ID = os.getenv("CF_ZONE_ID")
 CF_API_TOKEN = os.getenv("CF_API_TOKEN")
-CF_API_URL_BASE = (
-    f"https://api.cloudflare.com/client/v4/zones/{CF_ZONE_ID}/dns_records"
-)
-
+CF_API_URL_BASE = f"https://api.cloudflare.com/client/v4/zones/{CF_ZONE_ID}/dns_records"
 APPRISE_URLS = os.getenv("APPRISE_URLS", "").split(",")
 
 MAPPING_FILE = '/config/guid_mapping.json'
@@ -105,6 +82,58 @@ def send_notification(message):
             notification.add(url)
     notification.notify(body=message)
 
+@app.route("/status", methods=["GET"])
+def status():
+    # Return the status of DNS records from LOG_DATABASE
+    try:
+        with open(LOG_DATABASE, 'r') as file:
+            data = json.load(file)
+            return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# CLI Argument Parsing
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Manage DNS records via Cloudflare API.")
+    subparsers = parser.add_subparsers(dest="command")
+
+    # Generate command
+    generate_parser = subparsers.add_parser("generate", help="Generate a new DNS record")
+    generate_parser.add_argument("subdomain", type=str, help="Subdomain to generate")
+
+    # Delete command
+    delete_parser = subparsers.add_parser("delete", help="Delete an existing DNS record")
+    delete_parser.add_argument("subdomain", type=str, help="Subdomain to delete")
+
+    # Update command
+    update_parser = subparsers.add_parser("update", help="Update an existing DNS record")
+    update_parser.add_argument("subdomain", type=str, help="Subdomain to update")
+    update_parser.add_argument("ip_address", type=str, help="New IP address for the subdomain")
+
+    # Status command
+    status_parser = subparsers.add_parser("status", help="Get the status of DNS records")
+
+    return parser.parse_args()
+
+def main():
+    args = parse_arguments()
+
+    if args.command == "generate":
+        # Generate functionality
+        pass
+    elif args.command == "delete":
+        # Delete functionality
+        pass
+    elif args.command == "update":
+        # Update functionality
+        pass
+    elif args.command == "status":
+        # Since status needs to run the Flask app to access the route,
+        # consider invoking HTTP request to "/status" here or refactor.
+        pass
+    else:
+        # If no CLI command is provided, run the Flask app
+        app.run(host="0.0.0.0")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
