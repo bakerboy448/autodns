@@ -1,3 +1,37 @@
+"""
+The `autodns.py` module automates DNS record management for Cloudflare-hosted domains directly from the command line or through a Flask-based web interface. Utilizing environment variables for configuration, it supports creating, updating, and deleting DNS A records based on GUID mappings, with automatic IP detection for incoming web requests. Notifications on operation outcomes are dispatched using the Apprise library.
+
+Features include:
+- Command Line Interface (CLI) for direct script interactions to manage DNS records.
+- Flask web server integration for handling DNS updates via web requests.
+- GUID to DNS A record mapping, facilitating secure and identifiable record management.
+- Automatic IP detection from incoming web requests, supporting both direct and proxied connections.
+- Notification system powered by Apprise, supporting a broad array of services for real-time operation alerts.
+
+Modules Used:
+- `json`: For loading and handling the GUID to A record mappings from a JSON file.
+- `os`: To access environment variables for Cloudflare API credentials and Apprise configuration.
+- `apprise`: Utilized for sending operation outcome notifications across various platforms.
+- `requests`: Employed to interact with the Cloudflare API for DNS record management.
+- `flask`: Facilitates the creation of the web interface, enabling DNS updates through HTTP requests.
+
+Environment Variables:
+- `CF_ZONE_ID`: Specifies the Cloudflare zone ID where DNS records will be managed.
+- `CF_API_TOKEN`: The API token used for authentication with the Cloudflare API.
+- `APPRISE_URLS`: Defines a comma-separated list of URLs for Apprise notification services.
+
+Available Commands:
+- `generate <subdomain>`: Creates a new DNS A record for the specified subdomain.
+- `delete <subdomain>`: Removes an existing DNS A record matching the specified subdomain.
+- `update <subdomain> <ip_address>`: Updates the IP address of the specified subdomain's DNS A record.
+- `status`: Retrieves the current status of all managed DNS records and operation logs.
+
+Usage:
+- To execute a CLI command: `python autodns.py <command> [arguments]`
+- To run the Flask web server: Simply execute `python autodns.py` without any commands.
+
+Note: This module assumes a pre-existing Flask environment and requires prior configuration of Cloudflare API credentials and Apprise notification URLs through environment variables.
+"""
 import argparse
 import json
 import os
