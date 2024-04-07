@@ -165,6 +165,40 @@ def parse_arguments():
 
     return parser.parse_args()
 
+
+@app.route("/update-dns", methods=["GET"])
+def update_dns_web():
+    """Web endpoint to update DNS record based on GUID and detected IP."""
+    guid = request.args.get("guid")
+    guid_to_a_record_mapping = load_guid_mapping()
+
+    if guid not in guid_to_a_record_mapping:
+        return jsonify({"error": "Unauthorized or unknown GUID"}), 401
+
+    # Simulate getting the IP address either from a direct connection or a forwarded header
+    new_ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0]
+
+    # Simulate updating the DNS record
+    print(f"Simulated update of {guid_to_a_record_mapping[guid]} to IP {new_ip} via web request.")
+    send_notification(f"DNS record for {guid_to_a_record_mapping[guid]} updated successfully to {new_ip} via web request.")
+    
+    return jsonify({"success": True, "message": f"DNS record for {guid_to_a_record_mapping[guid]} updated to {new_ip}."})
+
+def update_dns_cli(subdomain, ip_address):
+    """CLI function to update DNS record."""
+    guid_to_a_record_mapping = load_guid_mapping()
+    guid = [key for key, value in guid_to_a_record_mapping.items() if value == subdomain]
+
+    if not guid:
+        print(f"No GUID found for subdomain {subdomain}.")
+        return
+
+    # Simulate updating the DNS record
+    print(f"Simulated update of {subdomain} to IP {ip_address} via CLI.")
+    send_notification(f"DNS record for {subdomain} updated successfully to {ip_address} via CLI.")
+
+
+
 def main():
     args = parse_arguments()
 
