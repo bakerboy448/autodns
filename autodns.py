@@ -21,10 +21,12 @@ Environment Variables:
 - `APPRISE_URLS`: Defines a comma-separated list of URLs for Apprise notification services.
 
 Available Commands:
-- `generate <subdomain>`: Creates a new DNS A record for the specified subdomain.
+- `generate <subdomain>`: Creates a new GUID record for the specified subdomain.
+- `create <subdomain>`: Creates a new DNS A record for the specified subdomain.
 - `delete <subdomain>`: Removes an existing DNS A record matching the specified subdomain.
 - `update <subdomain> <ip_address>`: Updates the IP address of the specified subdomain's DNS A record.
 - `status`: Retrieves the current status of all managed DNS records and operation logs.
+- `server`: Run the flask server and listen to incoming requests with the specified guid to update a subdomain's A record 
 
 Usage:
 - To execute a CLI command: `python autodns.py <command> [arguments]`
