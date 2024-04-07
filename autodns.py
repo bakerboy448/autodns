@@ -150,7 +150,9 @@ def main():
     """Main function to run the Flask app or handle CLI commands."""
     args = parse_arguments()
     if hasattr(args, 'func'):
-        args.func(args) else: # If no CLI command is provided, run the Flask app # Use the FLASK_RUN_PORT environment variable or default to port 5000
+        args.func(args)
+    else:
+        # If no CLI command is provided, run the Flask app # Use the FLASK_RUN_PORT environment variable or default to port 5000
         port = int(os.getenv("FLASK_RUN_PORT", "5000"))
         app.run(host="0.0.0.0", port=port)
         if name == "main":
