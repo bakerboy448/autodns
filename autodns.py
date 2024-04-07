@@ -116,6 +116,18 @@ def send_notification(message):
             notification.add(url)
     notification.notify(body=message)
 
+
+def show_current_ip():
+    """Fetch and display the current public IP address."""
+    try:
+        response = requests.get("https://httpbin.org/ip")
+        response.raise_for_status()  # Raises an error for bad responses
+        ip = response.json().get('origin')
+        print(f"Current Public IP: {ip}")
+    except requests.RequestException as e:
+        print(f"Error fetching public IP: {e}")
+
+
 @app.route("/status", methods=["GET"])
 def status():
     # Return the status of DNS records from LOG_DATABASE
@@ -126,8 +138,9 @@ def status():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 # CLI Argument Parsing
-def parse_arguments():
+def parse_arguments(): 
     parser = argparse.ArgumentParser(description="Manage DNS records via Cloudflare API.")
     subparsers = parser.add_subparsers(dest="command")
 
@@ -147,27 +160,31 @@ def parse_arguments():
     # Status command
     status_parser = subparsers.add_parser("status", help="Get the status of DNS records")
 
+    # Show IP command
+    show_ip_parser = subparsers.add_parser("show-ip", help="Display the current public IP address")
+
     return parser.parse_args()
 
 def main():
     args = parse_arguments()
 
     if args.command == "generate":
-        # Generate functionality
+        # Generate UUID functionality
         pass
     elif args.command == "delete":
         # Delete functionality
         pass
     elif args.command == "update":
-        # Update functionality
+        update_dns()
         pass
     elif args.command == "status":
-        # Since status needs to run the Flask app to access the route,
-        # consider invoking HTTP request to "/status" here or refactor.
+        status()
+        pass
+    elif args.command == "show-ip":
+        show_current_ip()
+    elif args.command == "server":
+        # run the Flask app
+        app.run(host="0.0.0.0")
         pass
     else:
-        # If no CLI command is provided, run the Flask app
-        app.run(host="0.0.0.0")
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+        help_text = "Available commands: generate, delete, update, status"
