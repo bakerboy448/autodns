@@ -43,7 +43,7 @@ CF_API_TOKEN = os.getenv("CF_API_TOKEN")
 CF_API_URL_BASE = f"https://api.cloudflare.com/client/v4/zones/{CF_ZONE_ID}/dns_records"
 ENABLE_NOTIFICATIONS = os.getenv("ENABLE_NOTIFICATIONS", "false").lower() in ["true", "1", "t"]
 APPRISE_URLS = os.getenv("APPRISE_URLS", "").split(",")
-MAPPING_FILE = 'guid_mapping.json'
+MAPPING_FILE = '/config/guid_mapping.json'
 
 def load_guid_mapping():
     """Load GUID to A record mapping and last update timestamps from a JSON file."""
