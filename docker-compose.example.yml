@@ -1,12 +1,15 @@
-version: "3.8"
+version: "3.9"  # Updated to the latest supported version as of 2024
 services:
-  cf-dns-updater:
-    build: .
+  autodns:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "4295:4295"
     volumes:
-      - /your/path/to/config:/config
+      - "/your/path/to/config:/config"
     environment:
       CF_ZONE_ID: "your-zone-id"
       CF_API_TOKEN: "your-api-token"
       APPRISE_URLS: "your-apprise-urls-separated-by-commas"
+    restart: unless-stopped
