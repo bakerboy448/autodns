@@ -17,6 +17,11 @@ Before you begin, ensure you have met the following requirements:
 
 ## Docker
 
+Command/Variable,Description
+CF_ZONE_ID,Cloudflare Zone ID for the DNS records you are updating.
+CF_API_TOKEN,API token used to authenticate with Cloudflare’s API.
+APPRISE_URLS,Comma-separated URLs for notification services
+
 ```shell
 docker run -d --name autodns \
   -p 4295:4295 \
