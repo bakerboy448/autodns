@@ -1,11 +1,36 @@
-FROM python:3.9-slim
+# Use an updated and specific version of the Python image
+FROM python:3.11-slim-bullseye
 
+# Define work directory
 WORKDIR /app
 
+# Set Python to not generate .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Set Python stdout and stderr streams to be unbuffered
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc libffi-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Update pip and install dependencies via wheel to speed up installation
+RUN python -m pip install --upgrade pip setuptools wheel
+
+# Copy only the requirements file to leverage Docker cache
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the rest of the application
 COPY . .
 
-CMD ["python", "./app.py"]
+# Specify non-root user to run the app
+RUN useradd -m myuser
+USER myuser
+
+# Command to run the application
+CMD ["python", "./autodns.py"]
