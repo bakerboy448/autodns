@@ -15,6 +15,19 @@ Before you begin, ensure you have met the following requirements:
 - Docker and Docker Compose installed on your machine.
 - A Cloudflare account and API token with DNS edit permissions.
 
+## Docker
+
+```shell
+docker run -d --name autodns \
+  -p 4295:4295 \
+  -v /your/path/to/config:/config \
+  -e CF_ZONE_ID="your-zone-id" \
+  -e CF_API_TOKEN="your-api-token" \
+  -e APPRISE_URLS="your-apprise-urls-separated-by-commas" \
+  --restart unless-stopped \
+  autodns
+```
+
 ## Setup
 
 1. **Clone the Repository**
