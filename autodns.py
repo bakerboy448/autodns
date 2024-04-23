@@ -67,7 +67,7 @@ def save_guid_mapping(mapping):
 
 def generate_guid(subdomain):
     """Generate a 64-character SHA-256 hash GUID based on subdomain and current time."""
-    unique_string = f"{subdomain}{time.time()}"
+    unique_string = f"{subdomain}"
     return hashlib.sha256(unique_string.encode()).hexdigest()
 
 def is_update_allowed(guid):
