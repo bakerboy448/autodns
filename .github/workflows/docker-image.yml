@@ -28,7 +28,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and Push Docker image
-      run: |
+      run: | 
         BRANCH_NAME="${{ github.ref_name }}"
         SHORT_SHA="${{ github.sha | cut -c1-7 }}"
         if [[ "${{ github.event_name }}" == "push" ]]; then
