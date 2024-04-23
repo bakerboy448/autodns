@@ -5,41 +5,37 @@ on:
     branches:
       - main
       - develop
-  pull_request:
-    branches:
-      - main
-      - develop
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and Push Docker image
-      run: | 
-        BRANCH_NAME="${{ github.ref_name }}"
-        SHORT_SHA="${{ github.sha | cut -c1-7 }}"
-        if [[ "${{ github.event_name }}" == "push" ]]; then
-          if [[ "$BRANCH_NAME" == "main" || "$BRANCH_NAME" == "develop" ]]; then
-            TAG="ghcr.io/${{ github.repository_owner }}/autodns:$BRANCH_NAME-$SHORT_SHA"
-          else
-            TAG="ghcr.io/${{ github.repository_owner }}/autodns:feature-$BRANCH_NAME-$SHORT_SHA"
+      - name: Build and Push Docker image
+        run: |
+          TAG="ghcr.io/${{ github.repository_owner }}/autodns"
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            IMAGE_TAG="latest"
+          elif [[ "${{ github.ref_name }}" == "develop" ]]; then
+            IMAGE_TAG="develop"
+          elif [[ "${{ github.ref_type }}" == "tag" ]]; then
+            IMAGE_TAG="${{ github.ref_name }}"
           fi
-        elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-          TAG="ghcr.io/${{ github.repository_owner }}/autodns:PR-${{ github.event.pull_request.number }}-$BRANCH_NAME-$SHORT_SHA"
-        fi
-        echo "Building and pushing Docker image with tag $TAG"
-        docker build . --file Dockerfile --tag $TAG
-        docker push $TAG
+          FULL_TAG="${TAG}:${IMAGE_TAG}"
+          echo "Building and pushing Docker image with tag $FULL_TAG"
+          docker build . --file Dockerfile --tag $FULL_TAG
+          docker push $FULL_TAG
