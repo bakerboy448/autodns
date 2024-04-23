@@ -12,4 +12,5 @@ services:
       CF_ZONE_ID: "your-zone-id"
       CF_API_TOKEN: "your-api-token"
       APPRISE_URLS: "your-apprise-urls-separated-by-commas"
+      FLASK_RUN_PORT: 4295
     restart: unless-stopped
