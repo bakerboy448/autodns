@@ -29,15 +29,11 @@ docker run -d --name autodns \
   -e CF_ZONE_ID="your-zone-id" \
   -e CF_API_TOKEN="your-api-token" \
   -e APPRISE_URLS="your-apprise-urls-separated-by-commas" \
+  -e FLASK_RUN_PORT="4295" \
   --restart unless-stopped \
   autodns
 ```
 
 ## Setup
 
-1. **Clone the Repository**
-
-   ```bash
-   git clone https://your-repository-url.git
-   cd your-repository-directory
-    ```
+**Coming Soon**
