@@ -25,12 +25,12 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
-COPY . .
-
 # Specify non-root user to run the app
 RUN useradd -m myuser
 USER myuser
+
+# Expose the port the app runs on
+EXPOSE 4295
 
 # Command to run the application
 CMD ["python", "./autodns.py"]
