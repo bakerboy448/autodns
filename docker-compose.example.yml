@@ -1,14 +1,14 @@
 services:
   autodns:
-    image:ghcr.io/bakerboy448/autodns:latest
+    image: ghcr.io/bakerboy448/autodns:develop
     ports:
-      - "4295:4295"
+    - "4295:4295"
     volumes:
-      - "/your/path/to/config:/config"
+    - "/your/path/to/config:/config"
     environment:
-      CF_ZONE_ID: "your-zone-id"
-      CF_API_TOKEN: "your-api-token"
-      APPRISE_URLS: "your-apprise-urls-separated-by-commas"
-      AUTODNS_PORT: 4295
-      AUTODNS_HOST: 0.0.0.0 # Any IPv4
+    - CF_ZONE_ID: "your-zone-id"
+    - CF_API_TOKEN: "your-api-token"
+    - APPRISE_URLS: "your-apprise-urls-separated-by-commas"
+    - AUTODNS_PORT: 4295
+    - AUTODNS_HOST: 0.0.0.0 # Any IPv4
     restart: unless-stopped
