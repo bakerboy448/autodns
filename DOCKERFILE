@@ -10,6 +10,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Set Python stdout and stderr streams to be unbuffered
 ENV PYTHONUNBUFFERED=1
 
+# Set Flask application port
+ENV FLASK_RUN_PORT=4295
+
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc libffi-dev \
@@ -25,12 +28,12 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
-COPY . .
-
 # Specify non-root user to run the app
 RUN useradd -m myuser
 USER myuser
+
+# Expose the port the app runs on
+EXPOSE 4295
 
 # Command to run the application
 CMD ["python", "./autodns.py"]
