@@ -1,0 +1,11 @@
+# Gitleaks configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "autodns gitleaks config"
+
+[allowlist]
+  description = "Global allowlist"
+  paths = [
+    '''\.env\.example''',
+    '''docker-compose\.example\.yml''',
+  ]
