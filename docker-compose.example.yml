@@ -1,6 +1,6 @@
 services:
   autodns:
-    image: ghcr.io/bakerboy448/autodns:develop
+    image: ghcr.io/baker-scripts/autodns:develop
     ports:
     - "4295:4295"
     volumes:
