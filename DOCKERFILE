@@ -1,6 +1,16 @@
 # Use an updated and specific version of the Python image
 FROM python:3.11-slim-bullseye
 
+# OCI Labels
+LABEL org.opencontainers.image.title="AutoDNS" \
+      org.opencontainers.image.description="Lightweight DNS updater — automatically syncs Cloudflare DNS records via GUID-based identification" \
+      org.opencontainers.image.authors="baker-scripts" \
+      org.opencontainers.image.source="https://github.com/baker-scripts/autodns" \
+      org.opencontainers.image.documentation="https://github.com/baker-scripts/autodns/blob/develop/README.md" \
+      org.opencontainers.image.licenses="GPL-3.0" \
+      org.opencontainers.image.vendor="baker-scripts" \
+      org.opencontainers.image.base.name="python:3.11-slim-bullseye"
+
 # Define work directory
 WORKDIR /app
 
