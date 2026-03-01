@@ -32,5 +32,5 @@ docker run -d \
   -e APPRISE_URLS="your-apprise-urls-separated-by-commas" \
   -e AUTODNS_PORT=4295 \
   -e AUTODNS_HOST=0.0.0.0 \
-  ghcr.io/bakerboy448/autodns:develop
+  ghcr.io/baker-scripts/autodns:develop
 ```
