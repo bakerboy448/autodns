@@ -27,7 +27,7 @@ import json
 import os
 import requests
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from flask import Flask, request, jsonify
 import apprise
 
@@ -68,7 +68,7 @@ def get_client_ip():
 def load_guid_mapping():
     """Load GUID to A record mapping and last update timestamps from a JSON file."""
     try:
-        with open(MAPPING_FILE, "r") as file:
+        with open(MAPPING_FILE) as file:
             return json.load(file)
     except FileNotFoundError:
         return {}
@@ -99,7 +99,7 @@ def is_update_allowed(guid):
     if guid not in mapping:
         return True
     last_update = datetime.fromisoformat(mapping[guid]["lastUpdated"])
-    return datetime.now() - last_update > timedelta(minutes=RATE_LIMIT_MINUTES)
+    return datetime.now(timezone.utc) - last_update > timedelta(minutes=RATE_LIMIT_MINUTES)
 
 
 def send_notification(message):
@@ -137,15 +137,15 @@ def update_dns_web():
     data = {"type": "A", "name": dns_record, "content": new_ip, "ttl": 1}
 
     response = requests.get(
-        f"{CF_API_URL_BASE}?name={dns_record}&type=A", headers=headers
+        f"{CF_API_URL_BASE}?name={dns_record}&type=A", headers=headers, timeout=30
     )
     if response.status_code == 200 and response.json()["result"]:
         dns_record_id = response.json()["result"][0]["id"]
         update_response = requests.put(
-            f"{CF_API_URL_BASE}/{dns_record_id}", headers=headers, json=data
+            f"{CF_API_URL_BASE}/{dns_record_id}", headers=headers, json=data, timeout=30
         )
         if update_response.status_code == 200:
-            mapping[guid]["lastUpdated"] = datetime.now().isoformat()
+            mapping[guid]["lastUpdated"] = datetime.now(timezone.utc).isoformat()
             save_guid_mapping(mapping)
             send_notification(
                 f"DNS record for {dns_record} updated successfully to {new_ip}."
@@ -185,7 +185,7 @@ def handle_generate_command(args):
     if subdomain in [m["subdomain"] for m in mapping.values()]:
         print(f"Subdomain {subdomain} already has a GUID assigned.")
         return
-    mapping[guid] = {"subdomain": subdomain, "lastUpdated": datetime.now().isoformat()}
+    mapping[guid] = {"subdomain": subdomain, "lastUpdated": datetime.now(timezone.utc).isoformat()}
     save_guid_mapping(mapping)
     print(f"Generated GUID for {subdomain}: {guid}")
     send_notification(f"Generated new GUID for {subdomain}.")

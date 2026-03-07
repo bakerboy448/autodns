@@ -6,10 +6,10 @@ services:
     volumes:
     - "/your/path/to/config:/config"
     environment:
-    - CF_ZONE_ID: "your-zone-id"
-    - CF_API_TOKEN: "your-api-token"
-    - APPRISE_URLS: "your-apprise-urls-separated-by-commas"
-    - AUTODNS_PORT: 4295
-    - AUTODNS_HOST: 0.0.0.0 # Any IPv4
-    - TRUSTED_PROXIES: "" # Comma-separated IPs of trusted reverse proxies (e.g. "172.23.0.2,10.0.0.1")
+      - "CF_ZONE_ID=your-zone-id"
+      - "CF_API_TOKEN=your-api-token"
+      - "APPRISE_URLS=your-apprise-urls-separated-by-commas"
+      - "AUTODNS_PORT=4295"
+      - "AUTODNS_HOST=0.0.0.0"
+      - "TRUSTED_PROXIES="
     restart: unless-stopped
