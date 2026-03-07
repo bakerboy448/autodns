@@ -11,4 +11,5 @@ services:
     - APPRISE_URLS: "your-apprise-urls-separated-by-commas"
     - AUTODNS_PORT: 4295
     - AUTODNS_HOST: 0.0.0.0 # Any IPv4
+    - TRUSTED_PROXIES: "" # Comma-separated IPs of trusted reverse proxies (e.g. "172.23.0.2,10.0.0.1")
     restart: unless-stopped
