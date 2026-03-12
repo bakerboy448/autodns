@@ -1,5 +1,5 @@
 # Use an updated and specific version of the Python image
-FROM python:3.11-slim-bullseye
+FROM python:3.13-slim-bullseye
 
 # OCI Labels
 LABEL org.opencontainers.image.title="AutoDNS" \
