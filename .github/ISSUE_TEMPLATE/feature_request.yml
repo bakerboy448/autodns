@@ -1,0 +1,29 @@
+name: Feature Request
+description: Suggest an improvement to the DNS updater
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - New DNS provider
+        - Notification enhancement
+        - IP detection improvement
+        - Docker / deployment
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What would you like?
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Why is this needed?
+    validations:
+      required: true

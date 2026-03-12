@@ -36,3 +36,17 @@ docker run -d \
   -e TRUSTED_PROXIES="" \
   ghcr.io/baker-scripts/autodns:develop
 ```
+
+## Contributors
+
+<a href="https://github.com/baker-scripts/autodns/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=baker-scripts/autodns" alt="Contributors" />
+</a>
+
+## Disclaimer
+
+This software is provided as-is with no warranty. Always review configurations before applying and test in a non-production environment first. The authors are not responsible for any DNS issues or service disruptions resulting from its use.
+
+## License
+
+[GPL-3.0](LICENSE)
