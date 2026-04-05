@@ -1,20 +1,47 @@
+---
 version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+      day: monday
     commit-message:
       prefix: "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - dependencies
+      - github-actions
   - package-ecosystem: pip
     directory: /
     schedule:
       interval: weekly
+      day: monday
     commit-message:
       prefix: "chore"
+    groups:
+      pip-minor-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
+      - python
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: weekly
+      day: monday
     commit-message:
       prefix: "chore"
+    groups:
+      docker-minor-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
+      - docker
