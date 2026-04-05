@@ -1,5 +1,7 @@
 # Cloudflare DNS Updater
 
+[![Docker](https://github.com/baker-scripts/autodns/actions/workflows/docker-image.yml/badge.svg)](https://github.com/baker-scripts/autodns/actions/workflows/docker-image.yml)
+
 The Cloudflare DNS Updater (AutoDNS) is a Flask-based application designed to automate the updating of A records on Cloudflare. Using GUIDs for DNS record identification, it features automatic IP detection from incoming requests and integrates with Apprise for sending notifications upon successful updates or when errors occur.
 
 ## Features
@@ -15,7 +17,7 @@ Before you begin, ensure you have met the following requirements:
 - Docker and Docker Compose installed on your machine.
 - A Cloudflare account and API token with DNS edit permissions.
 
-## Enviormental Variables
+## Environmental Variables
 
 - `CF_ZONE_ID` - Cloudflare Zone ID for the DNS records you are updating.
 - `CF_API_TOKEN` - API token used to authenticate with Cloudflare’s API.
