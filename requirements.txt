@@ -4,6 +4,6 @@ apprise==1.9.9
 Werkzeug==3.1.7
 Jinja2==3.1.6
 itsdangerous==2.2.0
-click==8.3.1
+click==8.3.2
 MarkupSafe==3.0.3
 blinker==1.9.0
