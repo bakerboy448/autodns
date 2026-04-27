@@ -45,5 +45,5 @@ jobs:
           fi
           FULL_TAG="${TAG}:${IMAGE_TAG}"
           echo "Building and pushing Docker image with tag $FULL_TAG"
-          docker build . --file DOCKERFILE --tag $FULL_TAG
-          docker push $FULL_TAG
+          docker build . --file DOCKERFILE --tag "$FULL_TAG"
+          docker push "$FULL_TAG"

@@ -2,9 +2,9 @@ services:
   autodns:
     image: ghcr.io/baker-scripts/autodns:develop
     ports:
-    - "4295:4295"
+      - "4295:4295"
     volumes:
-    - "/your/path/to/config:/config"
+      - "/your/path/to/config:/config"
     environment:
       - "CF_ZONE_ID=your-zone-id"
       - "CF_API_TOKEN=your-api-token"
