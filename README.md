@@ -39,6 +39,10 @@ docker run -d \
   ghcr.io/baker-scripts/autodns:develop
 ```
 
+## Contributing
+
+Issues and pull requests welcome. See the [contributing guidelines](https://github.com/baker-scripts/.github/blob/main/CONTRIBUTING.md); [open an issue](https://github.com/baker-scripts/autodns/issues) to discuss larger changes.
+
 ## Contributors
 
 <a href="https://github.com/baker-scripts/autodns/graphs/contributors">
